@@ -59,7 +59,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else if (Patterns.WEB_URL.matcher(result.getContents()).matches()) {
                 Intent visitUrl = new Intent(Intent.ACTION_VIEW, Uri.parse(result.getContents()));
                 startActivity(visitUrl);
+            } else if (Patterns.PHONE.matcher(result.getContents()).matches()) {
+                String telp = String.valueOf(result.getContents());
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + telp));
+                startActivity(callIntent);
 
+            } else if(Patterns.WEB_URL.matcher(result.getContents()).matches()) {
                 try {
                     Uri uri = Uri.parse(result.getContents());
                     Intent intent = new Intent(Intent.ACTION_VIEW,uri);
@@ -78,14 +84,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
-            }
-
-            else if (Patterns.PHONE.matcher(result.getContents()).matches()) {
-                String telp = String.valueOf(result.getContents());
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + telp));
-                startActivity(callIntent);
-
             } else {
                 try {
                     //Convert Data to JSON
