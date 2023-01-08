@@ -12,4 +12,6 @@
   <img src="./Image-QR_Code/web-link.png" width="200" height="200" alt="QR Web Link"/>
     <h3>Qr Code Maps Link</h3>
   <img src="./Image-QR_Code/maps-link.png" width="200" height="200" alt="QR Maps Link"/>
+    <h3>Qr Code Send Email</h3>
+  <img src="./Image-QR_Code/qrcode-email.png" width="200" height="200" alt="QR Maps Link"/>
  </div>
