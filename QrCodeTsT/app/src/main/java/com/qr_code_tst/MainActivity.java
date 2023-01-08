@@ -2,6 +2,7 @@ package com.qr_code_tst;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.net.MailTo;
 
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
@@ -15,6 +16,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.client.result.EmailAddressResultParser;
+import com.google.zxing.client.result.URIResultParser;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -39,33 +42,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         txtName = (TextView) findViewById(R.id.txtName);
         txtKelas = (TextView) findViewById(R.id.txtclass);
         txtNIM = (TextView) findViewById(R.id.nim);
-        //Initial
+
+
+        //Initialize
         QRScan = new IntentIntegrator(this);
         //Action Object
         btnScan.setOnClickListener(this);
     }
-    //Get Result Scanning
 
-
+        //Get Result Scanning
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
 
         if (result != null) {
+            // If No Data Found
             if (result.getContents() == null) {
-                Toast.makeText(this, "Hasil Scanning Tidak Ada", Toast.LENGTH_LONG).show();
-
-            } else if (Patterns.WEB_URL.matcher(result.getContents()).matches()) {
+                Toast.makeText(this, "Scanning Result not Found", Toast.LENGTH_LONG).show();
+            }
+                // Get Data from Web URL
+            else if (Patterns.WEB_URL.matcher(result.getContents()).matches()) {
                 Intent visitUrl = new Intent(Intent.ACTION_VIEW, Uri.parse(result.getContents()));
                 startActivity(visitUrl);
-            } else if (Patterns.PHONE.matcher(result.getContents()).matches()) {
-                String telp = String.valueOf(result.getContents());
+            }
+                // Get Data from Number to Phone Call
+            else if (Patterns.PHONE.matcher(result.getContents()).matches()) {
+                String Tel = String.valueOf(result.getContents());
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + telp));
+                callIntent.setData(Uri.parse("tel:" + Tel));
                 startActivity(callIntent);
-
-            } else if(Patterns.WEB_URL.matcher(result.getContents()).matches()) {
+            }
+            else if(Patterns.WEB_URL.matcher(result.getContents()).matches()) {
                 try {
                     Uri uri = Uri.parse(result.getContents());
                     Intent intent = new Intent(Intent.ACTION_VIEW,uri);
@@ -84,7 +92,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
-            } else {
+            }
+            // Get Data QR with recipient
+            else if (Patterns.EMAIL_ADDRESS.matcher(result.getContents()).matches()) {
+                Intent intent = new Intent(Intent.ACTION_SENDTO,
+                        Uri.parse(result.getContents()));
+                try {
+                    startActivity(intent);
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(this, "APP Not Found", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else {
                 try {
                     //Convert Data to JSON
                     JSONObject obj = new JSONObject(result.getContents());
@@ -98,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, result.getContents(), Toast.LENGTH_LONG).show();
                 }
             }
+
         } else {
             super.onActivityResult(requestCode,resultCode,data);
         }
